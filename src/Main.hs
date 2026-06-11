@@ -16,9 +16,9 @@ foreign export javascript "hs_start" main :: IO ()
 -----------------------------------------------------------------------------
 main :: IO ()
 main = do
-  initialTime <- now
   startApp defaultEvents (component initialModel updateModel mainView)
-    { subs = [ keyboardSub Keyboard ]
-    , mount = Just (Time initialTime)
+    { subs = [ keyboardSub Keyboard
+             , rAFSub Time
+             ]
     }
 -----------------------------------------------------------------------------

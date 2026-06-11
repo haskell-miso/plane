@@ -9,8 +9,8 @@ import           Miso.Html.Property
 import           Constants
 import           Model
 -----------------------------------------------------------------------------
-mainView :: Model -> View Model Action
-mainView m = wrapper [ div_ [ CSS.style_ style', onClick Touched ] content ]
+mainView :: props -> Model -> View Model Action
+mainView _ m = wrapper [ div_ [ CSS.style_ style', onClick Touched ] content ]
   where
     style' =
       [ ("width", (ms gameWidth) <> "px")
