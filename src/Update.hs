@@ -6,6 +6,7 @@ module Update where
 import           Control.Monad.State hiding ( state )
 import           Data.Function
 import qualified Data.IntSet as S
+import           Data.Maybe (mapMaybe)
 -----------------------------------------------------------------------------
 import           System.Random
 import           Miso
@@ -50,9 +51,12 @@ updatePillars m@Model{..} = m { timeToPillar = newTimeToPillar, pillars = update
       if timeToPillar <= 0 then timeBetweenPillars
       else if state == Play then timeToPillar - delta
       else timeToPillar
-    updatedPillars = pillars
-      & map (\p -> p { pillarX = (pillarX p) - foregroundScrollV * delta })
-      & filter (\p -> pillarX p > 0 - fromIntegral pillarWidth)
+    updatedPillars = mapMaybe scroll pillars
+    scroll p =
+      let newX = pillarX p - foregroundScrollV * delta
+      in if newX > negate (fromIntegral pillarWidth)
+         then Just (p { pillarX = newX })
+         else Nothing
 -----------------------------------------------------------------------------
 updateTime :: Double -> Model -> Model
 updateTime newTime m@Model{..} = m { time = newTime, delta = newTime - time }
@@ -85,8 +89,7 @@ checkFailState :: Model -> Model
 checkFailState m@Model{..} = m { state = newState }
   where
     newState = if state == Play && (playerOffScreen m || playerCollidedWithPillar) then GameOver else state
-    collisionPillars = filter (isColliding m) pillars & length
-    playerCollidedWithPillar = collisionPillars > 0
+    playerCollidedWithPillar = any (isColliding m) pillars
 -----------------------------------------------------------------------------
 updateBackground :: Model -> Model
 updateBackground m@Model{..} = m { backgroundX = newBackgroundX }
@@ -125,10 +128,11 @@ generatePillars bottomHeight =
 updateScore :: Model -> Model
 updateScore m@Model{..} = m { pillars = newPillars, score = newScore }
   where
-    newlyPassedPillars = pillars & filter (\p -> not (pillarPassed p) && (pillarX p) < playerX) & length
-    newPillars = pillars & map markPassedPillar
-    newScore = if newlyPassedPillars > 0 then score + 1 else score
-    markPassedPillar p = if not (pillarPassed p) && (pillarX p) < playerX then p { pillarPassed = True} else p
+    (anyPassed, newPillars) = foldr tally (False, []) pillars
+    tally p (acc, ps)
+      | not (pillarPassed p) && pillarX p < playerX = (True, p { pillarPassed = True } : ps)
+      | otherwise = (acc, p : ps)
+    newScore = if anyPassed then score + 1 else score
 -----------------------------------------------------------------------------
 transitionState :: Model -> Model
 transitionState m@Model{..} =

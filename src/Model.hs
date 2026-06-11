@@ -33,7 +33,6 @@ data Pillar = Pillar
 -----------------------------------------------------------------------------
 data Model = Model
   { state        :: State
-  , foregroundX  :: Double
   , backgroundX  :: Double
   , y            :: Double
   , vy           :: Double
@@ -47,7 +46,6 @@ data Model = Model
 initialModel :: Model
 initialModel = Model
   { state = Start
-  , foregroundX = 0
   , backgroundX = 0
   , y = fromIntegral gameHeight / 2
   , vy = 0
