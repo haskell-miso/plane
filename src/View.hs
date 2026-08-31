@@ -20,7 +20,7 @@ gameContainerStyle =
   , ("transform", "translateX(-240px) translateY(-240px)")
   ]
 -----------------------------------------------------------------------------
-mainView :: context props -> Model -> View context Model Action
+mainView :: context -> props -> Model -> View context Model Action
 mainView _ _ m = wrapper [ div_ [ CSS.style_ gameContainerStyle, onClick Touched ] content ]
   where
     content =
@@ -75,7 +75,7 @@ scoreView Model{..} = p_ [ CSS.style_ scoreStyle ] [ text (ms score) ]
 wrapper :: [View context Model action] -> View context Model action
 wrapper = div_ []
 -----------------------------------------------------------------------------
-emptyView :: View Model action
+emptyView :: View context Model action
 emptyView = wrapper []
 -----------------------------------------------------------------------------
 image :: Int -> Int -> Double -> Double -> MisoString -> View context Model action
