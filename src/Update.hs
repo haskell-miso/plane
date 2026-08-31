@@ -14,7 +14,7 @@ import           Miso
 import           Constants
 import           Model
 -----------------------------------------------------------------------------
-updateModel :: Action -> Effect parent props Model Action
+updateModel :: Action -> Effect context props Model Action
 updateModel = \case
   Time newTime ->
     get >>= step newTime
@@ -29,7 +29,7 @@ updateModel = \case
 jump :: Model -> Model
 jump m = m & transitionState & updatePlayerVelocity
 -----------------------------------------------------------------------------
-step :: Double -> Model -> Effect parent props Model Action
+step :: Double -> Model -> Effect context props Model Action
 step newTime m = do
     put newModel
     batch (if shouldAddPillar then [ pillarsTransition ] else [ ])
